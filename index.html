@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嬷嬷模拟器 - 相对性别配对分析</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-balance-scale"></i> 嬷嬷模拟器</h1>
+            <p class="subtitle">基于刻板印象与意识反抗的相对性别配对分析系统</p>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <div class="section">
+                    <h2><i class="fas fa-user-plus"></i> 创建/编辑角色</h2>
+                    <div class="character-form">
+                        <div class="form-group">
+                            <label for="charName">角色名称:</label>
+                            <input type="text" id="charName" placeholder="输入角色名">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="physiology">生理性别:</label>
+                                <select id="physiology">
+                                    <option value="male">男性</option>
+                                    <option value="female">女性</option>
+                                    <option value="intersex">双性</option>
+                                    <option value="neutral">中性/无性</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="socialGender">社会性别:</label>
+                                <select id="socialGender">
+                                    <option value="male">男性</option>
+                                    <option value="female">女性</option>
+                                    <option value="neutral">中性</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>特征选择 (可多选):</label>
+                            <div class="traits-grid" id="traitsContainer">
+                                <!-- 特征选项将通过JS动态生成 -->
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="momoCorrection">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">应用嬷化修正 (意识反抗)</span>
+                            </label>
+                            <div class="slider-container">
+                                <label for="momoStrength">嬷化强度: <span id="strengthValue">5</span></label>
+                                <input type="range" id="momoStrength" min="1" max="10" value="5">
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button id="saveChar" class="btn btn-primary">
+                                <i class="fas fa-save"></i> 保存角色
+                            </button>
+                            <button id="resetChar" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> 重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2><i class="fas fa-cogs"></i> 算法参数设置</h2>
+                    <div class="algorithm-settings">
+                        <div class="form-group">
+                            <label for="baseMale">纯男性基础值:</label>
+                            <input type="number" id="baseMale" value="-100" min="-200" max="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="baseFemale">纯女性基础值:</label>
+                            <input type="number" id="baseFemale" value="100" min="0" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label for="intersexMale">双性(社会男)基础值:</label>
+                            <input type="number" id="intersexMale" value="-80" min="-150" max="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="intersexFemale">双性(社会女)基础值:</label>
+                            <input type="number" id="intersexFemale" value="80" min="0" max="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analysis-panel">
+                <div class="section">
+                    <h2><i class="fas fa-user-friends"></i> 角色管理</h2>
+                    <div class="character-list" id="characterList">
+                        <!-- 角色卡片将通过JS动态生成 -->
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <p>暂无角色，请先创建角色</p>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-controls">
+                        <h3><i class="fas fa-random"></i> 配对分析</h3>
+                        <div class="comparison-selectors">
+                            <div class="selector">
+                                <label for="charA">角色 A:</label>
+                                <select id="charA">
+                                    <option value="">选择角色...</option>
+                                </select>
+                            </div>
+                            <div class="vs-circle">VS</div>
+                            <div class="selector">
+                                <label for="charB">角色 B:</label>
+                                <select id="charB">
+                                    <option value="">选择角色...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="analyzeBtn" class="btn btn-analyze">
+                            <i class="fas fa-play-circle"></i> 开始分析
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="section results-section">
+                    <h2><i class="fas fa-chart-bar"></i> 分析结果</h2>
+                    <div class="results-container" id="resultsContainer">
+                        <div class="empty-state">
+                            <i class="fas fa-chart-line"></i>
+                            <p>选择两个角色进行配对分析</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="algorithm-explanation">
+            <h3><i class="fas fa-info-circle"></i> 算法说明</h3>
+            <div class="steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <div class="step-content">
+                        <h4>基础性别赋值</h4>
+                        <p>纯男性: <span class="value negative">-100</span>, 纯女性: <span class="value positive">+100</span>, 双性按社会性别调整</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <div class="step-content">
+                        <h4>刻板印象特征调整</h4>
+                        <p>根据选择的特征增加或减少相对性别值 (正值增加左位倾向，负值增加右位倾向)</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <div class="step-content">
+                        <h4>嬷化修正</h4>
+                        <p>对刻板印象特征进行反向调整，实现"意识反抗"</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <div class="step-content">
+                        <h4>配对比较</h4>
+                        <p>比较两个角色的最终值，值大者为左位，值小者为右位</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>嬷嬷模拟器 v1.0 | 相对性别分析算法 | 仅供娱乐与研究使用</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
